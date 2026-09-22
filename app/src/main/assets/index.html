@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#173f3a">
+<title>羽球记录</title>
+<style>
+:root{
+  --bg:#f4f7f6;--surface:#ffffff;--surface2:#f8fbfa;--ink:#172a27;--muted:#6d7c79;
+  --line:#dce7e4;--brand:#238b7d;--brand-dark:#176b61;--brand-soft:#e6f5f1;
+  --gold:#e7b85c;--danger:#c94f59;--danger-soft:#fff0f1;--shadow:0 10px 28px rgba(22,65,57,.08);
+  --r:18px;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+input,select,textarea{width:100%;min-height:48px;border:1px solid #cddbd7;border-radius:13px;background:#fff;padding:11px 12px;outline:none;font-size:16px}
+select{-webkit-appearance:menulist;appearance:auto}
+textarea{min-height:92px;resize:vertical;line-height:1.55}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(35,139,125,.11)}
+button:focus-visible{outline:3px solid rgba(35,139,125,.25);outline-offset:2px}
+.shell{max-width:1120px;margin:0 auto;padding:calc(12px + var(--safe-top)) 12px calc(28px + var(--safe-bottom))}
+.app-head{background:linear-gradient(135deg,#183f3a 0%,#238b7d 72%,#36a08f 100%);border-radius:24px;padding:20px 20px 18px;color:#fff;box-shadow:0 12px 30px rgba(23,90,80,.16);position:relative;overflow:hidden}
+.app-head:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-48px;top:-60px;background:rgba(255,255,255,.08)}
+.eyebrow{font-size:11px;letter-spacing:.14em;font-weight:800;opacity:.78}.app-head h1{font-size:25px;margin:4px 0 4px;line-height:1.15}.app-head p{margin:0;font-size:13px;line-height:1.55;opacity:.88;max-width:620px}
+.local-pill{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.13);font-size:12px}.local-dot{width:7px;height:7px;border-radius:50%;background:#b6ffcf}
+.nav{display:flex;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 2px 12px;position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 78%,rgba(244,247,246,0));scrollbar-width:none}.nav::-webkit-scrollbar{display:none}
+.nav button{border:1px solid var(--line);background:rgba(255,255,255,.96);color:#63736f;border-radius:999px;padding:9px 13px;white-space:nowrap;min-height:40px;font-size:13px;font-weight:650}.nav button.active{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 5px 16px rgba(35,139,125,.18)}
+.view{display:none}.view.active{display:block}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}.full{grid-column:span 12}.half{grid-column:span 6}.third{grid-column:span 4}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}.card.flat{box-shadow:none}.card h2{font-size:19px;margin:0 0 5px}.card h3{font-size:15px;margin:0}.section-sub{font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.55}
+.form-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:11px}.field{grid-column:span 3}.field.wide{grid-column:span 6}.field.full{grid-column:span 12}.field.time{grid-column:span 3}
+label{display:block;font-size:12px;font-weight:700;color:#677773;margin:0 0 6px}.label-row{display:flex;justify-content:space-between;gap:8px;align-items:end;margin-bottom:6px}.label-row label{margin:0}
+.inline-select{display:grid;grid-template-columns:1fr auto;gap:8px}.icon-btn{min-width:48px;min-height:48px;border:0;border-radius:13px;background:var(--brand-soft);color:var(--brand-dark);font-size:21px;font-weight:700}.icon-btn:active{transform:scale(.98)}
+.duration{align-self:end;padding:0 2px 13px;color:var(--brand-dark);font-size:13px;font-weight:750}.court-schedule{display:grid;gap:9px}.court-schedule-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.court-slot{display:grid;grid-template-columns:minmax(92px,.75fr) minmax(0,1.25fr);gap:9px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:13px;background:#fbfdfc}.court-slot-time{font-size:13px;font-weight:800;color:var(--brand-dark);white-space:nowrap}.court-hint{padding:11px 12px;border:1px dashed #c8d9d5;border-radius:13px;color:var(--muted);font-size:13px;background:#fbfdfc}.gender-chip{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;font-size:11px;font-weight:800;margin-left:5px;background:#f0f4f3;color:#586763}.gender-chip.female{background:#fff0f5;color:#a64769}.gender-chip.male{background:#edf5ff;color:#3e689b}.partner-pick{min-height:50px;border:1px solid #cddbd7;border-radius:13px;background:#fff;padding:8px 10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;cursor:pointer}.partner-pick .placeholder{color:#8b9895;font-size:15px}.chip{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;background:var(--brand-soft);color:var(--brand-dark);font-size:12px;font-weight:700}.chip.neutral{background:#eef2f1;color:#586763}.chip.gold{background:#fff4dc;color:#8b661e}
+.more{grid-column:span 12;border:1px solid var(--line);border-radius:14px;background:var(--surface2);overflow:hidden}.more summary{list-style:none;cursor:pointer;min-height:48px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;font-weight:780;color:var(--brand-dark)}.more summary::-webkit-details-marker{display:none}.more summary:after{content:"＋";font-size:20px;font-weight:500}.more[open] summary:after{content:"－"}.more-inner{padding:0 13px 13px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:11px}
+.btn{border:0;border-radius:13px;padding:10px 14px;min-height:44px;background:#edf2f1;color:#42534f;font-weight:700}.btn.primary{background:var(--brand);color:#fff}.btn.primary:active{background:var(--brand-dark)}.btn.soft{background:var(--brand-soft);color:var(--brand-dark)}.btn.gold{background:#fff0cf;color:#76561c}.btn.danger{background:var(--danger-soft);color:#a83d46}.btn.block{width:100%;min-height:50px;font-size:16px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row.between{justify-content:space-between}.tiny{font-size:12px;color:var(--muted)}.muted{color:var(--muted);line-height:1.6}.hide{display:none!important}
+.stat{grid-column:span 3;min-height:110px;display:flex;flex-direction:column;justify-content:center}.stat-num{font-size:29px;font-weight:850;letter-spacing:-.02em}.stat-label{margin-top:5px;font-size:12px;color:var(--muted)}
+.session-list,.entity-list{display:grid;gap:10px}.session-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px}.session-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.session-date{font-weight:850;font-size:16px}.session-place{font-weight:760}.session-meta{font-size:12px;color:var(--muted);margin-top:3px}.session-body{margin-top:10px;display:grid;gap:7px}.session-note{font-size:13px;line-height:1.55;color:#475853}.session-actions{display:flex;gap:7px;justify-content:flex-end;margin-top:11px}
+.entity-card{border:1px solid var(--line);border-radius:17px;padding:14px;background:#fff}.entity-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}.avatar{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#dff3ee,#f9f0d9);color:#275e56;font-weight:850;font-size:17px;flex:0 0 auto}.entity-title{font-weight:850;font-size:16px}.entity-sub{font-size:12px;color:var(--muted);margin-top:3px}.entity-details{margin-top:10px;display:grid;gap:7px}.detail-line{font-size:13px;line-height:1.55}.detail-line b{color:#4f625e}.growth{margin-top:11px;border-top:1px dashed var(--line);padding-top:10px}.growth-item{position:relative;padding-left:14px;margin:8px 0;font-size:13px;line-height:1.5;color:#465650}.growth-item:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand);position:absolute;left:0;top:7px}
+.search-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin:12px 0}.search-row input{min-height:44px}.count-badge{font-size:11px;font-weight:800;padding:4px 7px;border-radius:999px;background:#eef3f2;color:#60706c}
+.bar-row{margin:11px 0}.bar-label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:5px}.bar{height:8px;background:#edf2f1;border-radius:999px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#63b7aa);border-radius:999px}
+.canvas-wrap{grid-column:span 8}.side-card{grid-column:span 4}canvas{display:block;width:100%;height:260px}
+.timeline{position:relative;padding-left:17px}.timeline:before{content:"";position:absolute;left:5px;top:3px;bottom:4px;width:2px;background:var(--line)}.timeline-item{position:relative;padding:0 0 17px 14px}.timeline-item:before{content:"";position:absolute;left:-16px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}.timeline-date{font-size:11px;color:var(--brand-dark);font-weight:800}.timeline-title{font-weight:820;margin:3px 0}.timeline-text{font-size:13px;color:var(--muted);line-height:1.5}
+.empty{padding:28px 12px;text-align:center;color:#879591;font-size:13px}.tip{padding:12px 13px;border-radius:14px;background:#fff8e9;border:1px solid #f1dfaf;color:#6b5a28;font-size:13px;line-height:1.6}
+.modal{position:fixed;inset:0;z-index:100;display:none;background:rgba(9,30,27,.42);align-items:flex-end;justify-content:center;padding:0}.modal.show{display:flex}.sheet{width:min(680px,100%);max-height:88vh;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -16px 44px rgba(17,53,47,.22);padding:12px 14px calc(16px + var(--safe-bottom));overflow:auto;-webkit-overflow-scrolling:touch}.sheet.center{border-radius:22px;margin:auto;max-height:90vh;width:min(620px,calc(100% - 24px));padding:17px}.grab{width:42px;height:4px;border-radius:999px;background:#d7e1de;margin:0 auto 12px}.sheet-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.sheet-title h3{margin:0;font-size:18px}.close{width:40px;height:40px;border:0;border-radius:12px;background:#eef3f2;color:#53635f;font-size:19px}.picker-list{display:grid;gap:7px;max-height:52vh;overflow:auto}.picker-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:13px;background:#fff}.picker-item input{width:20px;height:20px;min-height:0;flex:0 0 auto}.picker-main{flex:1;min-width:0}.picker-name{font-weight:780}.picker-sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sheet-footer{position:sticky;bottom:0;background:linear-gradient(rgba(255,255,255,.1),#fff 24%);padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-form{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:10px}.modal-form .field{grid-column:span 6}.modal-form .field.full{grid-column:span 12}
+.footer{text-align:center;font-size:11px;color:#95a09e;padding:25px 0 5px}
+@media(max-width:820px){.half,.canvas-wrap,.side-card{grid-column:span 12}.third{grid-column:span 6}.field{grid-column:span 6}.field.wide{grid-column:span 12}.field.time{grid-column:span 3}}
+@media(max-width:560px){
+ .shell{padding-left:9px;padding-right:9px}.app-head{border-radius:20px;padding:18px 17px}.app-head h1{font-size:23px}.card{padding:13px;border-radius:16px}.grid{gap:9px}
+ .field,.field.wide{grid-column:span 12}.field.time{grid-column:span 6}.duration{grid-column:span 12;padding:0 2px 2px}.stat{grid-column:span 6;min-height:96px}.stat-num{font-size:26px}.more-inner .field,.more-inner .field.wide{grid-column:span 12}
+ .session-top{align-items:center}.session-actions .btn{min-height:38px;padding:8px 10px}.modal-form .field{grid-column:span 12}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="app-head">
+    <div class="eyebrow">BADMINTON LOG</div>
+    <h1>🏸 羽球手账</h1>
+    <div class="local-pill"><span class="local-dot"></span>Android 本地存储 · 无需联网</div>
+  </header>
+
+  <nav class="nav" id="nav">
+    <button class="active" data-view="log">记一场</button>
+    <button data-view="dashboard">总览</button>
+    <button data-view="partners">球搭子</button>
+    <button data-view="venues">场馆</button>
+    <button data-view="skills">球技</button>
+    <button data-view="data">备份</button>
+  </nav>
+
+  <main>
+    <section id="log" class="view active">
+      <div class="grid">
+        <div class="card full">
+          <h2 id="sessionFormTitle">极速记录一场</h2>
+          <p class="section-sub">常用信息在首页完成；想多记一点时再展开“更多信息”。</p>
+          <form id="sessionForm" class="form-grid">
+            <input type="hidden" id="sessionId">
+            <div class="field wide"><label>日期</label><input id="date" type="date" required></div>
+            <div class="field time"><label>开始</label><select id="start"></select></div>
+            <div class="field time"><label>结束</label><select id="end"></select></div>
+            <div class="duration" id="durationDisplay">选择时间后自动计算时长</div>
+
+            <div class="field wide">
+              <div class="label-row"><label>场馆</label><span class="tiny">可管理自定义场馆</span></div>
+              <div class="inline-select"><select id="venueSelect"></select><button type="button" class="icon-btn" id="quickAddVenue" aria-label="添加场馆">＋</button></div>
+            </div>
+            <div class="field full">
+              <div class="court-schedule-head"><div><label style="margin-bottom:2px">场地安排</label><span class="tiny">每个整点小时对应一个场地</span></div><button type="button" class="btn soft hide" id="copyFirstCourt" style="min-height:34px;padding:6px 10px">全部同第一小时</button></div>
+              <div class="court-schedule" id="courtSchedule"><div class="court-hint">先选择开始、结束时间和场馆。</div></div>
+            </div>
+
+            <div class="field full">
+              <div class="label-row"><label>球搭子</label><button type="button" class="btn soft" id="quickAddPartner" style="min-height:34px;padding:6px 10px">＋ 新球搭子</button></div>
+              <div class="partner-pick" id="partnerPickerBtn"><span class="placeholder">点这里选择一个或多个球搭子</span></div>
+            </div>
+
+            <details class="more">
+              <summary>更多信息</summary>
+              <div class="more-inner">
+                <div class="field"><label>形式</label><select id="type"><option>双打</option><option>单打</option><option>混双</option><option>自由打</option><option>专项练习</option><option>多球训练</option><option>其他</option></select></div>
+                <div class="field"><label>强度</label><select id="intensity"><option>轻松</option><option selected>中等</option><option>较高</option><option>高强度</option></select></div>
+                <div class="field"><label>当天状态</label><select id="state"><option value="1">⭐</option><option value="2">⭐⭐</option><option value="3" selected>⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option><option value="5">⭐⭐⭐⭐⭐</option></select></div>
+                <div class="field wide"><label>球技解锁（简记）</label><input id="unlock" placeholder="例如：反手过渡终于稳定了"></div>
+                <div class="field wide"><label>当天高光 / 进步</label><textarea id="highlight" placeholder="今天最值得记住的进步"></textarea></div>
+                <div class="field wide"><label>发生了什么</label><textarea id="event" placeholder="有趣的小事、搭档默契、谁突然爆发……"></textarea></div>
+                <div class="field wide"><label>下次想练</label><input id="next" placeholder="例如：网前搓球、接杀、平抽挡"></div>
+                <div class="field wide"><label>备注</label><input id="note" placeholder="其他想记的内容"></div>
+              </div>
+            </details>
+
+            <div class="field full"><button class="btn primary block" type="submit">保存这次打球</button></div>
+            <div class="field full row"><button class="btn hide" type="button" id="cancelEdit">取消编辑</button><span class="tiny">场馆和球搭子使用独立资料库，改名不会丢失历史关联。</span></div>
+          </form>
+        </div>
+
+        <div class="card full">
+          <div class="row between"><div><h2>历史记录</h2><p class="section-sub" style="margin-bottom:0">最近的场次优先显示。</p></div></div>
+          <div class="search-row"><input id="logSearch" placeholder="搜索日期、场馆、球搭子、备注…"><button class="btn soft" type="button" id="clearLogSearch">清除</button></div>
+          <div class="session-list" id="sessionList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="view">
+      <div class="grid">
+        <div class="card stat"><div class="stat-num" id="statCount">0</div><div class="stat-label">累计打球次数</div></div>
+        <div class="card stat"><div class="stat-num" id="statHours">0</div><div class="stat-label">累计时长（小时）</div></div>
+        <div class="card stat"><div class="stat-num" id="statPartners">0</div><div class="stat-label">球搭子人数</div></div>
+        <div class="card stat"><div class="stat-num" id="statSkills">0</div><div class="stat-label">球技解锁数</div></div>
+        <div class="card canvas-wrap"><h2>近 12 个月打球时长</h2><canvas id="monthChart" width="900" height="260"></canvas></div>
+        <div class="card side-card"><h2>最近解锁</h2><div id="recentUnlocks"></div></div>
+        <div class="card half"><h2>最常一起打的人</h2><div id="topPartners"></div></div>
+        <div class="card half"><h2>最常打的场馆 / 场地</h2><div id="topVenues"></div></div>
+      </div>
+    </section>
+
+    <section id="partners" class="view">
+      <div class="card">
+        <div class="row between"><div><h2>👥 球搭子档案</h2><p class="section-sub" style="margin-bottom:0">名字可以修改；曾用名、球风、喜好和成长轨迹都可以持续补充。</p></div><button class="btn primary" id="addPartnerBtn">＋ 添加球搭子</button></div>
+        <div class="search-row"><input id="partnerSearch" placeholder="搜索姓名、曾用名、球风、喜好…"><button class="btn soft" id="clearPartnerSearch">清除</button></div>
+        <div class="entity-list" id="partnerList"></div>
+      </div>
+    </section>
+
+    <section id="venues" class="view">
+      <div class="card">
+        <div class="row between"><div><h2>📍 场馆库</h2><p class="section-sub" style="margin-bottom:0">预置邱德拔体育馆 1–12 号场地、五四体育馆 1–10 号场地；也可以继续添加。</p></div><button class="btn primary" id="addVenueBtn">＋ 添加场馆</button></div>
+        <div class="entity-list" id="venueList" style="margin-top:14px"></div>
+      </div>
+    </section>
+
+    <section id="skills" class="view">
+      <div class="grid">
+        <div class="card full">
+          <h2 id="skillFormTitle">🎯 解锁一项球技 / 成就</h2>
+          <p class="section-sub">只记值得记住的变化：第一次会、开始稳定、形成战术意识，都可以。</p>
+          <form id="skillForm" class="form-grid">
+            <input type="hidden" id="skillId">
+            <div class="field"><label>日期</label><input id="skillDate" type="date" required></div>
+            <div class="field"><label>类别</label><select id="skillCategory"><option>发球</option><option>后场</option><option>网前</option><option>进攻</option><option>防守</option><option>平抽挡</option><option>步法</option><option>双打轮转</option><option>战术意识</option><option>体能</option><option>心态</option><option>隐藏成就</option><option>其他</option></select></div>
+            <div class="field wide"><label>技能 / 成就名称</label><input id="skillName" placeholder="例如：第一次杀球直接得分" required></div>
+            <div class="field"><label>等级</label><select id="skillLevel"><option>Lv.1 初识</option><option>Lv.2 能用</option><option>Lv.3 稳定</option><option>Lv.4 实战熟练</option><option>Lv.5 招牌技能</option></select></div>
+            <div class="field"><label>掌握程度</label><select id="skillMastery"><option>刚解锁</option><option>偶尔成功</option><option>基本稳定</option><option>实战稳定</option><option>已成为习惯</option></select></div>
+            <div class="field wide"><label>和谁一起</label><input id="skillWith" placeholder="可留空"></div>
+            <div class="field wide"><label>场馆 / 场地</label><input id="skillPlace" placeholder="例如：邱德拔体育馆 · 5号场地"></div>
+            <div class="field wide"><label>解锁契机</label><textarea id="skillStory"></textarea></div>
+            <div class="field wide"><label>后续备注</label><textarea id="skillNote"></textarea></div>
+            <div class="field full row"><button class="btn primary" type="submit">保存解锁</button><button class="btn hide" type="button" id="cancelSkillEdit">取消编辑</button></div>
+          </form>
+        </div>
+        <div class="card full"><h2>球技解锁时间线</h2><div id="skillTimeline"></div></div>
+      </div>
+    </section>
+
+    <section id="data" class="view">
+      <div class="grid">
+        <div class="card half"><h2>本地数据</h2><div class="tip">所有记录、场馆和球搭子资料都保存在这个 Android App 的私有存储里，不会自动上传。卸载 App 或清除应用数据前，请先导出 JSON 备份。</div></div>
+        <div class="card half"><h2>导出备份</h2><div class="row"><button class="btn primary" id="exportJson">完整 JSON</button><button class="btn soft" id="exportSessionsCsv">打球记录 CSV</button><button class="btn soft" id="exportPartnersCsv">球搭子 CSV</button></div></div>
+        <div class="card half"><h2>导入备份</h2><p class="muted">支持当前版本以及之前版本的 JSON，旧数据会自动迁移。</p><input id="importFile" type="file" accept=".json,application/json"><div style="height:9px"></div><button class="btn gold" id="importBtn">选择 JSON 并导入</button></div>
+        <div class="card half"><h2>数据管理</h2><p class="muted">清空后会保留系统预置的邱德拔体育馆和五四体育馆。</p><button class="btn danger" id="clearAll">清空个人记录</button></div>
+      </div>
+    </section>
+  </main>
+  <div class="footer">羽球手账 · Android 本地版</div>
+</div>
+
+<!-- 球搭子多选 -->
+<div class="modal" id="partnerPickerModal">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title"><h3>选择球搭子</h3><button class="close" data-close="partnerPickerModal">×</button></div>
+    <div class="search-row"><input id="partnerPickerSearch" placeholder="搜索姓名 / 曾用名"><button class="btn soft" id="pickerAddPartner">＋ 添加</button></div>
+    <div class="picker-list" id="partnerPickerList"></div>
+    <div class="sheet-footer"><button class="btn" id="partnerPickerClear">清空选择</button><button class="btn primary" id="partnerPickerDone">完成</button></div>
+  </div>
+</div>
+
+<!-- 球搭子编辑 -->
+<div class="modal" id="partnerModal">
+  <div class="sheet center">
+    <div class="sheet-title"><h3 id="partnerModalTitle">添加球搭子</h3><button class="close" data-close="partnerModal">×</button></div>
+    <form id="partnerForm" class="modal-form">
+      <input type="hidden" id="partnerId">
+      <div class="field wide"><label>当前名称 *</label><input id="partnerName" required placeholder="例如：小张"></div>
+      <div class="field"><label>性别 *</label><select id="partnerGender" required><option value="">请选择</option><option value="女">女</option><option value="男">男</option></select></div>
+      <div class="field full"><label>曾用名 / 别名</label><input id="partnerAliases" placeholder="多个名称用顿号或逗号分隔"></div>
+      <div class="field full"><label>球风</label><textarea id="partnerStyle" placeholder="例如：后场进攻型、喜欢抢网、拉吊耐心……"></textarea></div>
+      <div class="field full"><label>喜好 / 习惯</label><textarea id="partnerPreferences" placeholder="例如：喜欢双打、偏爱快节奏、常打左区……"></textarea></div>
+      <div class="field"><label>擅长 / 优势</label><textarea id="partnerStrengths"></textarea></div>
+      <div class="field"><label>配合提示 / 默契</label><textarea id="partnerTeamwork"></textarea></div>
+      <div class="field full"><label>其他备注</label><textarea id="partnerNotes"></textarea></div>
+      <div class="field full row"><button class="btn primary" type="submit">保存球搭子</button><button class="btn" type="button" id="deletePartnerBtn">删除</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- 成长轨迹 -->
+<div class="modal" id="growthModal">
+  <div class="sheet center">
+    <div class="sheet-title"><h3>添加成长轨迹</h3><button class="close" data-close="growthModal">×</button></div>
+    <form id="growthForm" class="modal-form">
+      <input type="hidden" id="growthPartnerId">
+      <div class="field full"><label>日期</label><input id="growthDate" type="date" required></div>
+      <div class="field full"><label>发生了什么 / 观察到的变化</label><textarea id="growthText" required placeholder="例如：反手防守明显稳定；开始主动抢网；双打轮转更自然……"></textarea></div>
+      <div class="field full"><button class="btn primary block" type="submit">加入成长轨迹</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- 场馆编辑 -->
+<div class="modal" id="venueModal">
+  <div class="sheet center">
+    <div class="sheet-title"><h3 id="venueModalTitle">添加场馆</h3><button class="close" data-close="venueModal">×</button></div>
+    <form id="venueForm" class="modal-form">
+      <input type="hidden" id="venueId">
+      <div class="field full"><label>场馆名称 *</label><input id="venueName" required placeholder="例如：新体育馆"></div>
+      <div class="field"><label>场地数量 *</label><input id="venueCourtCount" type="number" inputmode="numeric" min="1" max="99" required value="1"></div>
+      <div class="field full"><label>备注</label><textarea id="venueNote" placeholder="例如：地板、灯光、预约习惯等"></textarea></div>
+      <div class="field full row"><button class="btn primary" type="submit">保存场馆</button><button class="btn" type="button" id="deleteVenueBtn">删除</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="position:fixed;right:16px;bottom:calc(16px + var(--safe-bottom));z-index:150;background:#183f3a;color:#fff;padding:11px 14px;border-radius:12px;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s;box-shadow:var(--shadow)"></div>
+
+<script>
+var DATA_VERSION=6;
+var DEFAULT_VENUES=[
+  {id:'venue_qiu',name:'邱德拔体育馆',courtCount:12,note:'',createdAt:1},
+  {id:'venue_wusi',name:'五四体育馆',courtCount:10,note:'',createdAt:2}
+];
+var $=function(s){return document.querySelector(s)};
+var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var selectedPartnerIds=[];
+var partnerModalSelectOnSave=false;
+var data=loadData();
+
+function uid(prefix){return (prefix||'id')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function today(){var d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]})}
+function splitNames(v){return Array.from(new Set(String(v||'').split(/[、，,;；]+/).map(function(x){return x.trim()}).filter(Boolean)))}
+function fmtDate(v){if(!v)return '';var p=v.split('-');return p.length===3?p[0]+'.'+p[1]+'.'+p[2]:v}
+function timeLabel(v){if(v===''||v==null)return '';return String(Number(v)).padStart(2,'0')+':00'}
+function durationHours(a,b){if(a===''||b==='')return 0;var x=Number(a),y=Number(b);if(y<x)y+=24;return y-x}
+function csvCell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}
+function toast(msg){var t=$('#toast');t.textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';clearTimeout(t._timer);t._timer=setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(8px)'},1700)}
+function saveRaw(raw){if(window.Android&&typeof Android.saveData==='function')Android.saveData(raw);else localStorage.setItem('badmintonTrackerDataV4',raw)}
+function loadRaw(){if(window.Android&&typeof Android.loadData==='function')return Android.loadData()||'';return localStorage.getItem('badmintonTrackerDataV4')||localStorage.getItem('badmintonTrackerDataV2')||''}
+
+function ensureDefaultVenues(d){
+  if(!Array.isArray(d.venues))d.venues=[];
+  DEFAULT_VENUES.forEach(function(def){
+    var found=d.venues.find(function(v){return v.id===def.id||v.name===def.name});
+    if(!found)d.venues.push(Object.assign({},def));
+    else{if(!found.id)found.id=def.id;if(!found.courtCount)found.courtCount=def.courtCount}
+  });
+}
+function normalizePartner(p){
+  p=p||{};var growth=(Array.isArray(p.growth)?p.growth:[]).map(function(g){g=g||{};return {id:g.id||uid('growth'),date:g.date||'',text:g.text||'',createdAt:g.createdAt||Date.now()}});return {id:p.id||uid('partner'),name:String(p.name||'未命名球搭子'),gender:(p.gender==='女'||p.gender==='男')?p.gender:'',aliases:Array.isArray(p.aliases)?p.aliases:splitNames(p.aliases),style:p.style||'',preferences:p.preferences||'',strengths:p.strengths||'',teamwork:p.teamwork||'',notes:p.notes||'',growth:growth,createdAt:p.createdAt||Date.now()}
+}
+function normalizeVenue(v){v=v||{};return {id:v.id||uid('venue'),name:String(v.name||'未命名场馆'),courtCount:Math.max(1,Number(v.courtCount)||1),note:v.note||'',createdAt:v.createdAt||Date.now()}}
+function findOrCreatePartner(d,name){
+  name=String(name||'').trim();if(!name)return null;
+  var p=d.partners.find(function(x){return x.name===name||(x.aliases||[]).indexOf(name)>=0});
+  if(!p){p=normalizePartner({name:name});d.partners.push(p)}return p.id
+}
+function findOrCreateVenue(d,name,court){
+  name=String(name||'').trim();if(!name)return '';
+  var v=d.venues.find(function(x){return x.name===name});
+  if(!v){var n=parseInt(String(court||'').match(/\d+/),10)||1;v=normalizeVenue({name:name,courtCount:n});d.venues.push(v)}return v.id
+}
+function migrate(rawObj){
+  var d=rawObj&&typeof rawObj==='object'?rawObj:{};
+  if(!Array.isArray(d.sessions))d.sessions=[];if(!Array.isArray(d.skills))d.skills=[];if(!Array.isArray(d.partners))d.partners=[];
+  d.partners=d.partners.map(normalizePartner);ensureDefaultVenues(d);d.venues=d.venues.map(normalizeVenue);ensureDefaultVenues(d);
+  d.sessions=d.sessions.map(function(s){
+    s=s||{};
+    if(!s.venueId){s.venueId=findOrCreateVenue(d,s.venue||s.place||'',s.court||'')}
+    if(s.courtNumber==null){var m=String(s.court||'').match(/\d+/);s.courtNumber=m?String(Number(m[0])):'';s.customCourt=(!m&&s.court)?String(s.court):''}
+    if(!Array.isArray(s.courtSegments)||!s.courtSegments.length){
+      var slots=makeHourSlots(s.start,s.end);
+      s.courtSegments=slots.map(function(slot){return {startHour:slot.startHour,endHour:slot.endHour,courtNumber:s.courtNumber||'',customCourt:s.customCourt||''}});
+      if(!s.courtSegments.length&&(s.courtNumber||s.customCourt))s.courtSegments=[{startHour:s.start==null?'':Number(s.start),endHour:s.end==null?'':Number(s.end),courtNumber:s.courtNumber||'',customCourt:s.customCourt||''}]
+    }
+    if(!Array.isArray(s.partnerIds)){
+      var names=Array.isArray(s.friends)?s.friends:splitNames(s.friends||'');s.partnerIds=names.map(function(n){return findOrCreatePartner(d,n)}).filter(Boolean)
+    }
+    if(!s.id)s.id=uid('session');return s
+  });
+  d.version=DATA_VERSION;return d
+}
+function loadData(){
+  try{var raw=loadRaw();var d=raw?migrate(JSON.parse(raw)):migrate({sessions:[],skills:[],venues:[],partners:[]});saveRaw(JSON.stringify(d));return d}catch(e){return migrate({sessions:[],skills:[],venues:[],partners:[]})}
+}
+function saveData(){data=migrate(data);saveRaw(JSON.stringify(data));renderAll()}
+function getVenue(id){return data.venues.find(function(v){return v.id===id})||null}
+function getPartner(id){return data.partners.find(function(p){return p.id===id})||null}
+function venueName(s){var v=getVenue(s.venueId);return v?v.name:(s.venue||s.place||'')}
+function segmentCourtName(seg){if(!seg)return '';if(seg.customCourt)return seg.customCourt;if(seg.courtNumber)return seg.courtNumber+'号场地';return ''}
+function makeHourSlots(a,b){if(a===''||a==null||b===''||b==null)return [];var x=Number(a),y=Number(b);if(!Number.isFinite(x)||!Number.isFinite(y)||x===y)return [];if(y<x)y+=24;var out=[];for(var h=x;h<y;h++)out.push({startHour:h%24,endHour:(h+1)%24,key:(h%24)+'-'+((h+1)%24)});return out}
+function getCourtSegments(s){return Array.isArray(s.courtSegments)?s.courtSegments:[]}
+function courtSummary(s){var segs=getCourtSegments(s);if(!segs.length){if(s.customCourt)return s.customCourt;if(s.courtNumber)return s.courtNumber+'号场地';return s.court||''}var labels=segs.map(segmentCourtName);if(labels.length&&labels.every(function(x){return x===labels[0]}))return labels[0]+(labels.length>1?'（全程）':'');return segs.map(function(seg){return timeLabel(seg.startHour)+'–'+timeLabel(seg.endHour)+' '+segmentCourtName(seg)}).join(' · ')}
+function sessionPartnerNames(s){return (s.partnerIds||[]).map(getPartner).filter(Boolean).map(function(p){return p.name})}
+function genderChip(p){if(!p||!p.gender)return '';return '<span class="gender-chip '+(p.gender==='女'?'female':'male')+'">'+esc(p.gender)+'</span>'}
+
+function buildTimes(){var h='<option value="">请选择</option>';for(var i=0;i<24;i++)h+='<option value="'+i+'">'+String(i).padStart(2,'0')+':00</option>';$('#start').innerHTML=h;$('#end').innerHTML=h}
+function refreshVenueSelect(keep){
+  var current=keep!=null?keep:$('#venueSelect').value;var arr=data.venues.slice();
+  $('#venueSelect').innerHTML='<option value="">请选择场馆</option>'+arr.map(function(v){return '<option value="'+esc(v.id)+'">'+esc(v.name)+'</option>'}).join('');
+  if(current&&data.venues.some(function(v){return v.id===current}))$('#venueSelect').value=current;renderCourtSchedule()
+}
+function currentCourtSelections(){var map={};$$('#courtSchedule select[data-slot]').forEach(function(sel){map[sel.getAttribute('data-slot')]=sel.value});return map}
+function courtOptions(v,selected){var h='<option value="">请选择场地</option>';if(v){for(var i=1;i<=v.courtCount;i++)h+='<option value="'+i+'" '+(String(selected)===String(i)?'selected':'')+'>'+i+'号场地</option>';if(selected&&Number(selected)>v.courtCount)h+='<option value="'+esc(selected)+'" selected>'+esc(selected)+'号场地（历史）</option>'}return h}
+function renderCourtSchedule(preset){
+  var box=$('#courtSchedule'),v=getVenue($('#venueSelect').value),slots=makeHourSlots($('#start').value,$('#end').value),existing=currentCourtSelections(),presetMap={};
+  (preset||[]).forEach(function(seg){presetMap[String(seg.startHour)+'-'+String(seg.endHour)]=seg.courtNumber||''});
+  if(!v||!slots.length){box.innerHTML='<div class="court-hint">先选择开始、结束时间和场馆。</div>';$('#copyFirstCourt').classList.add('hide');return}
+  box.innerHTML=slots.map(function(slot){var selected=presetMap[slot.key]||existing[slot.key]||'';return '<div class="court-slot"><div class="court-slot-time">'+timeLabel(slot.startHour)+'–'+timeLabel(slot.endHour)+'</div><select data-slot="'+slot.key+'" data-start="'+slot.startHour+'" data-end="'+slot.endHour+'">'+courtOptions(v,selected)+'</select></div>'}).join('');
+  $('#copyFirstCourt').classList.toggle('hide',slots.length<2)
+}
+function collectCourtSegments(){var out=[];$$('#courtSchedule select[data-slot]').forEach(function(sel){out.push({startHour:Number(sel.getAttribute('data-start')),endHour:Number(sel.getAttribute('data-end')),courtNumber:sel.value,customCourt:''})});return out}
+function copyFirstCourt(){var sels=$$('#courtSchedule select[data-slot]');if(!sels.length||!sels[0].value){toast('先选择第一小时的场地');return}for(var i=1;i<sels.length;i++)sels[i].value=sels[0].value}
+function updateDuration(){var h=durationHours($('#start').value,$('#end').value);$('#durationDisplay').textContent=h?'本次约 '+h+' 小时':'选择时间后自动计算时长';renderCourtSchedule()}
+
+function openModal(id){$('#'+id).classList.add('show');document.body.style.overflow='hidden'}
+function closeModal(id){$('#'+id).classList.remove('show');document.body.style.overflow=$$('.modal.show').length?'hidden':''}
+$$('[data-close]').forEach(function(b){b.addEventListener('click',function(){closeModal(b.getAttribute('data-close'))})});
+$$('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)closeModal(m.id)})});
+window.androidBack=function(){var m=$$('.modal.show');if(m.length){closeModal(m[m.length-1].id);return true}return false};
+
+function renderSelectedPartners(){
+  var box=$('#partnerPickerBtn');var ps=selectedPartnerIds.map(getPartner).filter(Boolean);
+  if(!ps.length){box.innerHTML='<span class="placeholder">点这里选择一个或多个球搭子</span>';return}
+  box.innerHTML=ps.map(function(p){return '<span class="chip">'+esc(p.name)+genderChip(p)+'</span>'}).join('')+'<span class="tiny">点此修改</span>'
+}
+function renderPartnerPicker(){
+  var q=$('#partnerPickerSearch').value.trim().toLowerCase();var arr=data.partners.slice().sort(function(a,b){return a.name.localeCompare(b.name,'zh-CN')});
+  if(q)arr=arr.filter(function(p){return ([p.name,p.gender].concat(p.aliases||[]).concat([p.style,p.preferences])).join(' ').toLowerCase().indexOf(q)>=0});
+  if(!arr.length){$('#partnerPickerList').innerHTML='<div class="empty">没有匹配的球搭子，可以点右上角“添加”。</div>';return}
+  $('#partnerPickerList').innerHTML=arr.map(function(p){var checked=selectedPartnerIds.indexOf(p.id)>=0?'checked':'';var sub=[p.style,p.preferences].filter(Boolean).join(' · ');return '<label class="picker-item"><input type="checkbox" value="'+esc(p.id)+'" '+checked+'><div class="picker-main"><div class="picker-name">'+esc(p.name)+genderChip(p)+'</div><div class="picker-sub">'+esc(sub||((p.aliases||[]).length?'曾用名：'+p.aliases.join('、'):'暂无球风资料'))+'</div></div></label>'}).join('');
+  $$('#partnerPickerList input[type=checkbox]').forEach(function(c){c.addEventListener('change',function(){var id=c.value,ix=selectedPartnerIds.indexOf(id);if(c.checked&&ix<0)selectedPartnerIds.push(id);if(!c.checked&&ix>=0)selectedPartnerIds.splice(ix,1)})})
+}
+
+function resetSessionForm(){
+  $('#sessionForm').reset();$('#sessionId').value='';$('#date').value=today();$('#type').value='双打';$('#intensity').value='中等';$('#state').value='3';selectedPartnerIds=[];renderSelectedPartners();refreshVenueSelect('');$('#durationDisplay').textContent='选择时间后自动计算时长';renderCourtSchedule();$('#sessionFormTitle').textContent='极速记录一场';$('#cancelEdit').classList.add('hide')
+}
+function saveSession(e){
+  e.preventDefault();var segments=collectCourtSegments();var item={id:$('#sessionId').value||uid('session'),date:$('#date').value,start:$('#start').value,end:$('#end').value,hours:durationHours($('#start').value,$('#end').value),venueId:$('#venueSelect').value,courtSegments:segments,courtNumber:segments.length&&segments.every(function(x){return x.courtNumber===segments[0].courtNumber})?segments[0].courtNumber:'',customCourt:'',partnerIds:selectedPartnerIds.slice(),type:$('#type').value,intensity:$('#intensity').value,state:Number($('#state').value||3),unlock:$('#unlock').value.trim(),highlight:$('#highlight').value.trim(),event:$('#event').value.trim(),next:$('#next').value.trim(),note:$('#note').value.trim(),updatedAt:Date.now()};
+  if(!item.date){toast('请选择日期');return}if(item.start===''||item.end===''||!item.hours){toast('请选择有效的开始和结束时间');return}if(!item.venueId){toast('请选择场馆');return}if(!item.courtSegments.length||item.courtSegments.some(function(x){return !x.courtNumber&&!x.customCourt})){toast('请为每个小时选择场地');return}
+  var ix=data.sessions.findIndex(function(x){return x.id===item.id});if(ix>=0)data.sessions[ix]=item;else data.sessions.push(item);saveData();resetSessionForm();toast(ix>=0?'已更新这次打球':'已保存这次打球')
+}
+function editSession(id){
+  var s=data.sessions.find(function(x){return x.id===id});if(!s)return;$('#sessionId').value=s.id;$('#date').value=s.date||'';$('#start').value=s.start==null?'':s.start;$('#end').value=s.end==null?'':s.end;refreshVenueSelect(s.venueId||'');
+  renderCourtSchedule(getCourtSegments(s))
+  selectedPartnerIds=(s.partnerIds||[]).slice();renderSelectedPartners();$('#type').value=s.type||'双打';$('#intensity').value=s.intensity||'中等';$('#state').value=String(s.state||3);$('#unlock').value=s.unlock||'';$('#highlight').value=s.highlight||'';$('#event').value=s.event||'';$('#next').value=s.next||'';$('#note').value=s.note||'';updateDuration();$('#sessionFormTitle').textContent='编辑这次打球';$('#cancelEdit').classList.remove('hide');switchView('log');window.scrollTo({top:0,behavior:'smooth'})
+}
+function deleteSession(id){if(confirm('确定删除这条打球记录吗？')){data.sessions=data.sessions.filter(function(x){return x.id!==id});saveData();toast('已删除')}}
+
+function renderSessions(){
+  var q=$('#logSearch').value.trim().toLowerCase();var list=data.sessions.slice().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''))||(b.updatedAt||0)-(a.updatedAt||0)});
+  if(q)list=list.filter(function(s){return [s.date,venueName(s),courtSummary(s),sessionPartnerNames(s).join(' '),s.unlock,s.highlight,s.event,s.note].join(' ').toLowerCase().indexOf(q)>=0});
+  if(!list.length){$('#sessionList').innerHTML='<div class="empty">还没有记录。下一场打完球，就从这里开始。</div>';return}
+  $('#sessionList').innerHTML=list.map(function(s){var names=sessionPartnerNames(s);var notes=[];if(s.unlock)notes.push('🎯 '+s.unlock);if(s.highlight)notes.push('✨ '+s.highlight);if(s.event)notes.push('📝 '+s.event);return '<article class="session-card"><div class="session-top"><div><div class="session-date">'+esc(fmtDate(s.date))+'</div><div class="session-meta">'+esc([timeLabel(s.start),timeLabel(s.end)].filter(Boolean).join('–'))+(s.hours?' · '+s.hours+'h':'')+'</div></div><div style="text-align:right"><div class="session-place">'+esc(venueName(s))+'</div><div class="session-meta">'+esc(courtSummary(s))+'</div></div></div><div class="session-body"><div>'+names.map(function(n){return '<span class="chip">'+esc(n)+'</span>'}).join('')+'</div>'+(notes.length?'<div class="session-note">'+notes.map(esc).join('<br>')+'</div>':'')+'</div><div class="session-actions"><button class="btn soft" onclick="editSession(\''+s.id+'\')">编辑</button><button class="btn danger" onclick="deleteSession(\''+s.id+'\')">删除</button></div></article>'}).join('')
+}
+
+function partnerStats(id){var ss=data.sessions.filter(function(s){return (s.partnerIds||[]).indexOf(id)>=0});return {count:ss.length,hours:ss.reduce(function(a,s){return a+Number(s.hours||0)},0)}}
+function venueStats(id){var ss=data.sessions.filter(function(s){return s.venueId===id});return {count:ss.length,hours:ss.reduce(function(a,s){return a+Number(s.hours||0)},0)}}
+function openPartnerForm(id,selectAfter){
+  partnerModalSelectOnSave=!!selectAfter;var p=id?getPartner(id):null;$('#partnerId').value=p?p.id:'';$('#partnerName').value=p?p.name:'';$('#partnerGender').value=p?p.gender:'';$('#partnerAliases').value=p?(p.aliases||[]).join('、'):'';$('#partnerStyle').value=p?p.style:'';$('#partnerPreferences').value=p?p.preferences:'';$('#partnerStrengths').value=p?p.strengths:'';$('#partnerTeamwork').value=p?p.teamwork:'';$('#partnerNotes').value=p?p.notes:'';$('#partnerModalTitle').textContent=p?'编辑球搭子':'添加球搭子';$('#deletePartnerBtn').classList.toggle('hide',!p);openModal('partnerModal')
+}
+function savePartner(e){
+  e.preventDefault();var id=$('#partnerId').value,name=$('#partnerName').value.trim();if(!name){toast('请输入球搭子名称');return}var aliases=splitNames($('#partnerAliases').value).filter(function(a){return a!==name});var existing=id?getPartner(id):null;
+  if(existing&&existing.name!==name&&aliases.indexOf(existing.name)<0)aliases.unshift(existing.name);
+  var dup=data.partners.find(function(p){return p.id!==id&&p.name===name});if(dup){toast('已经有同名球搭子');return}
+  var gender=$('#partnerGender').value;if(!gender){toast('请选择球搭子性别');return}var p=normalizePartner({id:id||uid('partner'),name:name,gender:gender,aliases:aliases,style:$('#partnerStyle').value.trim(),preferences:$('#partnerPreferences').value.trim(),strengths:$('#partnerStrengths').value.trim(),teamwork:$('#partnerTeamwork').value.trim(),notes:$('#partnerNotes').value.trim(),growth:existing?existing.growth:[],createdAt:existing?existing.createdAt:Date.now()});
+  var ix=data.partners.findIndex(function(x){return x.id===p.id});if(ix>=0)data.partners[ix]=p;else data.partners.push(p);if(partnerModalSelectOnSave&&selectedPartnerIds.indexOf(p.id)<0)selectedPartnerIds.push(p.id);saveData();renderSelectedPartners();closeModal('partnerModal');if($('#partnerPickerModal').classList.contains('show'))renderPartnerPicker();toast(ix>=0?'球搭子资料已更新':'已添加球搭子')
+}
+function removePartner(){
+  var id=$('#partnerId').value;if(!id)return;var st=partnerStats(id);if(st.count>0){alert('这个球搭子已经关联 '+st.count+' 场记录，不能直接删除。你可以改名或保留为历史档案。');return}if(confirm('确定删除这个球搭子吗？')){data.partners=data.partners.filter(function(p){return p.id!==id});selectedPartnerIds=selectedPartnerIds.filter(function(x){return x!==id});saveData();closeModal('partnerModal');toast('已删除球搭子')}
+}
+function openGrowth(id){$('#growthPartnerId').value=id;$('#growthDate').value=today();$('#growthText').value='';openModal('growthModal')}
+function saveGrowth(e){e.preventDefault();var p=getPartner($('#growthPartnerId').value);if(!p)return;var text=$('#growthText').value.trim();if(!text)return;p.growth=p.growth||[];p.growth.push({id:uid('growth'),date:$('#growthDate').value,text:text,createdAt:Date.now()});p.growth.sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''))});saveData();closeModal('growthModal');toast('已加入成长轨迹')}
+function deleteGrowth(pid,gid){var p=getPartner(pid);if(!p)return;if(confirm('删除这条成长轨迹吗？')){p.growth=(p.growth||[]).filter(function(g){return g.id!==gid});saveData()}}
+function renderPartners(){
+  var q=$('#partnerSearch').value.trim().toLowerCase();var arr=data.partners.slice().sort(function(a,b){return a.name.localeCompare(b.name,'zh-CN')});if(q)arr=arr.filter(function(p){return [p.name,p.gender,(p.aliases||[]).join(' '),p.style,p.preferences,p.strengths,p.teamwork,p.notes].join(' ').toLowerCase().indexOf(q)>=0});
+  if(!arr.length){$('#partnerList').innerHTML='<div class="empty">还没有球搭子档案。点右上角添加第一个。</div>';return}
+  $('#partnerList').innerHTML=arr.map(function(p){var st=partnerStats(p.id),growth=(p.growth||[]).slice().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''))}),initial=(p.name||'?').slice(0,1);var details='<div class="detail-line"><b>性别：</b>'+esc(p.gender||'未填写')+'</div>';if((p.aliases||[]).length)details+='<div class="detail-line"><b>曾用名：</b>'+esc(p.aliases.join('、'))+'</div>';if(p.style)details+='<div class="detail-line"><b>球风：</b>'+esc(p.style)+'</div>';if(p.preferences)details+='<div class="detail-line"><b>喜好：</b>'+esc(p.preferences)+'</div>';if(p.strengths)details+='<div class="detail-line"><b>擅长：</b>'+esc(p.strengths)+'</div>';if(p.teamwork)details+='<div class="detail-line"><b>配合提示：</b>'+esc(p.teamwork)+'</div>';if(p.notes)details+='<div class="detail-line"><b>备注：</b>'+esc(p.notes)+'</div>';var gr=growth.length?'<div class="growth"><div class="row between"><b style="font-size:13px">成长轨迹</b><span class="count-badge">'+growth.length+' 条</span></div>'+growth.slice(0,4).map(function(g){return '<div class="growth-item"><b>'+esc(fmtDate(g.date))+'</b> · '+esc(g.text)+' <button class="btn danger" style="min-height:28px;padding:3px 7px;font-size:11px" onclick="deleteGrowth(\''+p.id+'\',\''+g.id+'\')">删</button></div>'}).join('')+'</div>':'';return '<article class="entity-card"><div class="entity-head"><div class="row" style="align-items:flex-start"><div class="avatar">'+esc(initial)+'</div><div><div class="entity-title">'+esc(p.name)+genderChip(p)+'</div><div class="entity-sub">一起打 '+st.count+' 场 · '+st.hours.toFixed(1)+' 小时</div></div></div><div class="row"><button class="btn soft" onclick="openGrowth(\''+p.id+'\')">＋轨迹</button><button class="btn" onclick="openPartnerForm(\''+p.id+'\',false)">编辑</button></div></div><div class="entity-details">'+(details||'<div class="tiny">还没有补充球风和喜好。</div>')+'</div>'+gr+'</article>'}).join('')
+}
+
+function openVenueForm(id){var v=id?getVenue(id):null;$('#venueId').value=v?v.id:'';$('#venueName').value=v?v.name:'';$('#venueCourtCount').value=v?v.courtCount:1;$('#venueNote').value=v?v.note:'';$('#venueModalTitle').textContent=v?'编辑场馆':'添加场馆';$('#deleteVenueBtn').classList.toggle('hide',!v||id==='venue_qiu'||id==='venue_wusi');openModal('venueModal')}
+function saveVenue(e){e.preventDefault();var id=$('#venueId').value,name=$('#venueName').value.trim(),count=Number($('#venueCourtCount').value);if(!name||!count||count<1){toast('请填写场馆名称和场地数量');return}var dup=data.venues.find(function(v){return v.id!==id&&v.name===name});if(dup){toast('已经有同名场馆');return}var old=id?getVenue(id):null;var v=normalizeVenue({id:id||uid('venue'),name:name,courtCount:count,note:$('#venueNote').value.trim(),createdAt:old?old.createdAt:Date.now()});var ix=data.venues.findIndex(function(x){return x.id===v.id});if(ix>=0)data.venues[ix]=v;else data.venues.push(v);saveData();closeModal('venueModal');refreshVenueSelect(v.id);toast(ix>=0?'场馆资料已更新':'已添加场馆')}
+function removeVenue(){var id=$('#venueId').value;if(!id)return;var st=venueStats(id);if(st.count>0){alert('这个场馆已经关联 '+st.count+' 场记录，因此不能直接删除。你可以修改场馆名称、场地数量或备注。');return}if(confirm('确定删除这个场馆吗？')){data.venues=data.venues.filter(function(v){return v.id!==id});saveData();closeModal('venueModal');toast('已删除场馆')}}
+function renderVenues(){
+  var arr=data.venues.slice().sort(function(a,b){if(a.id==='venue_qiu')return -1;if(b.id==='venue_qiu')return 1;if(a.id==='venue_wusi')return -1;if(b.id==='venue_wusi')return 1;return a.name.localeCompare(b.name,'zh-CN')});
+  $('#venueList').innerHTML=arr.map(function(v){var st=venueStats(v.id);return '<article class="entity-card"><div class="entity-head"><div><div class="entity-title">'+esc(v.name)+'</div><div class="entity-sub">1–'+v.courtCount+' 号场地 · 已记录 '+st.count+' 场 / '+st.hours.toFixed(1)+' 小时</div></div><button class="btn" onclick="openVenueForm(\''+v.id+'\')">编辑</button></div>'+(v.note?'<div class="entity-details"><div class="detail-line"><b>备注：</b>'+esc(v.note)+'</div></div>':'')+'</article>'}).join('')
+}
+
+function aggregatePartners(){return data.partners.map(function(p){var s=partnerStats(p.id);return {id:p.id,name:p.name,count:s.count,hours:s.hours}}).filter(function(x){return x.count>0}).sort(function(a,b){return b.count-a.count||b.hours-a.hours})}
+function aggregateVenueCourts(){var m={};data.sessions.forEach(function(s){var name=venueName(s),segs=getCourtSegments(s);if(!segs.length)segs=[{courtNumber:s.courtNumber||'',customCourt:s.customCourt||''}];segs.forEach(function(seg){var court=segmentCourtName(seg),key=name+'||'+court;if(!m[key])m[key]={name:[name,court].filter(Boolean).join(' · '),count:0,hours:0};m[key].count++;m[key].hours+=1})});return Object.keys(m).map(function(k){return m[k]}).sort(function(a,b){return b.hours-a.hours||b.count-a.count})}
+function barList(arr){if(!arr.length)return '<div class="empty">暂无数据</div>';var top=arr.slice(0,5),max=Math.max.apply(null,top.map(function(x){return x.count}).concat([1]));return top.map(function(x){return '<div class="bar-row"><div class="bar-label"><b>'+esc(x.name)+'</b><span class="tiny">'+x.count+' 次 · '+x.hours.toFixed(1)+'h</span></div><div class="bar"><span style="width:'+(x.count/max*100)+'%"></span></div></div>'}).join('')}
+function barListHours(arr){if(!arr.length)return '<div class="empty">暂无数据</div>';var top=arr.slice(0,5),max=Math.max.apply(null,top.map(function(x){return x.hours}).concat([1]));return top.map(function(x){return '<div class="bar-row"><div class="bar-label"><b>'+esc(x.name)+'</b><span class="tiny">'+x.hours.toFixed(1)+' 小时</span></div><div class="bar"><span style="width:'+(x.hours/max*100)+'%"></span></div></div>'}).join('')}
+function renderDashboard(){var hrs=data.sessions.reduce(function(a,s){return a+Number(s.hours||0)},0);$('#statCount').textContent=data.sessions.length;$('#statHours').textContent=hrs.toFixed(1);$('#statPartners').textContent=data.partners.length;$('#statSkills').textContent=data.skills.length;$('#topPartners').innerHTML=barList(aggregatePartners());$('#topVenues').innerHTML=barListHours(aggregateVenueCourts());var ru=data.skills.slice().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''))}).slice(0,4);$('#recentUnlocks').innerHTML=ru.length?ru.map(function(x){return '<div style="padding:9px 0;border-bottom:1px solid var(--line)"><div class="tiny">'+esc(fmtDate(x.date))+' · '+esc(x.category)+'</div><b style="font-size:13px">'+esc(x.name)+'</b></div>'}).join(''):'<div class="empty">暂无解锁</div>';drawChart()}
+function monthData(){var now=new Date(),arr=[];for(var i=11;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');arr.push({k:k,label:(d.getMonth()+1)+'月',hours:0})}var map={};arr.forEach(function(x){map[x.k]=x});data.sessions.forEach(function(s){var k=String(s.date||'').slice(0,7);if(map[k])map[k].hours+=Number(s.hours||0)});return arr}
+function drawChart(){var c=$('#monthChart');if(!c)return;var ctx=c.getContext('2d'),d=monthData(),w=c.width,h=c.height,p=38,max=Math.max.apply(null,d.map(function(x){return x.hours}).concat([1]));ctx.clearRect(0,0,w,h);ctx.strokeStyle='#dce7e4';ctx.fillStyle='#72817e';ctx.font='12px sans-serif';for(var i=0;i<4;i++){var y=p+(h-p*2)*i/3;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke()}var gap=(w-p*2)/d.length,bw=gap*.58;d.forEach(function(x,i){var bh=(h-p*2)*(x.hours/max),xx=p+i*gap+(gap-bw)/2,yy=h-p-bh;ctx.fillStyle='#238b7d';ctx.fillRect(xx,yy,bw,bh);ctx.fillStyle='#72817e';ctx.fillText(x.label,xx,h-14);if(x.hours>0)ctx.fillText(x.hours.toFixed(1),xx,Math.max(14,yy-5))})}
+
+function resetSkillForm(){$('#skillForm').reset();$('#skillId').value='';$('#skillDate').value=today();$('#skillFormTitle').textContent='🎯 解锁一项球技 / 成就';$('#cancelSkillEdit').classList.add('hide')}
+function saveSkill(e){e.preventDefault();var item={id:$('#skillId').value||uid('skill'),date:$('#skillDate').value,category:$('#skillCategory').value,name:$('#skillName').value.trim(),level:$('#skillLevel').value,mastery:$('#skillMastery').value,with:$('#skillWith').value.trim(),place:$('#skillPlace').value.trim(),story:$('#skillStory').value.trim(),note:$('#skillNote').value.trim(),updatedAt:Date.now()};var ix=data.skills.findIndex(function(x){return x.id===item.id});if(ix>=0)data.skills[ix]=item;else data.skills.push(item);saveData();resetSkillForm();toast(ix>=0?'已更新技能':'技能已解锁')}
+function editSkill(id){var x=data.skills.find(function(s){return s.id===id});if(!x)return;$('#skillId').value=x.id;$('#skillDate').value=x.date||'';$('#skillCategory').value=x.category||'其他';$('#skillName').value=x.name||'';$('#skillLevel').value=x.level||'Lv.1 初识';$('#skillMastery').value=x.mastery||'刚解锁';$('#skillWith').value=x.with||'';$('#skillPlace').value=x.place||'';$('#skillStory').value=x.story||'';$('#skillNote').value=x.note||'';$('#skillFormTitle').textContent='编辑技能解锁';$('#cancelSkillEdit').classList.remove('hide');switchView('skills');window.scrollTo({top:0,behavior:'smooth'})}
+function deleteSkill(id){if(confirm('确定删除这条技能解锁吗？')){data.skills=data.skills.filter(function(x){return x.id!==id});saveData()}}
+function renderSkills(){var a=data.skills.slice().sort(function(x,y){return String(y.date||'').localeCompare(String(x.date||''))||(y.updatedAt||0)-(x.updatedAt||0)});if(!a.length){$('#skillTimeline').innerHTML='<div class="empty">还没有技能解锁。第一次“突然会了”的时候记下来。</div>';return}$('#skillTimeline').innerHTML='<div class="timeline">'+a.map(function(x){return '<div class="timeline-item"><div class="timeline-date">'+esc(fmtDate(x.date))+' · '+esc(x.category)+'</div><div class="timeline-title">'+esc(x.name)+' <span class="chip gold">'+esc(x.level)+'</span></div><div class="timeline-text">'+esc([x.with&&'和 '+x.with,x.place&&'@ '+x.place,x.story].filter(Boolean).join(' · '))+'</div><div class="row" style="margin-top:7px"><span class="chip neutral">'+esc(x.mastery)+'</span><button class="btn soft" onclick="editSkill(\''+x.id+'\')">编辑</button><button class="btn danger" onclick="deleteSkill(\''+x.id+'\')">删除</button></div></div>'}).join('')+'</div>'}
+
+function renderAll(){refreshVenueSelect();renderSelectedPartners();renderSessions();renderPartners();renderVenues();renderSkills();renderDashboard()}
+function switchView(id){$$('#nav button').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-view')===id)});$$('.view').forEach(function(v){v.classList.toggle('active',v.id===id)});if(id==='dashboard')setTimeout(drawChart,30);window.scrollTo({top:0,behavior:'smooth'})}
+
+// navigation
+$('#nav').addEventListener('click',function(e){var b=e.target.closest('button[data-view]');if(b)switchView(b.getAttribute('data-view'))});
+// session
+buildTimes();$('#date').value=today();$('#skillDate').value=today();refreshVenueSelect();
+$('#start').addEventListener('change',updateDuration);$('#end').addEventListener('change',updateDuration);$('#venueSelect').addEventListener('change',function(){renderCourtSchedule()});$('#copyFirstCourt').addEventListener('click',copyFirstCourt);$('#sessionForm').addEventListener('submit',saveSession);$('#cancelEdit').addEventListener('click',resetSessionForm);$('#logSearch').addEventListener('input',renderSessions);$('#clearLogSearch').addEventListener('click',function(){$('#logSearch').value='';renderSessions()});
+// partner picker
+$('#partnerPickerBtn').addEventListener('click',function(){$('#partnerPickerSearch').value='';renderPartnerPicker();openModal('partnerPickerModal')});$('#partnerPickerSearch').addEventListener('input',renderPartnerPicker);$('#partnerPickerDone').addEventListener('click',function(){renderSelectedPartners();closeModal('partnerPickerModal')});$('#partnerPickerClear').addEventListener('click',function(){selectedPartnerIds=[];renderPartnerPicker()});$('#pickerAddPartner').addEventListener('click',function(){openPartnerForm('',true)});$('#quickAddPartner').addEventListener('click',function(){openPartnerForm('',true)});
+// partners
+$('#addPartnerBtn').addEventListener('click',function(){openPartnerForm('',false)});$('#partnerForm').addEventListener('submit',savePartner);$('#deletePartnerBtn').addEventListener('click',removePartner);$('#partnerSearch').addEventListener('input',renderPartners);$('#clearPartnerSearch').addEventListener('click',function(){$('#partnerSearch').value='';renderPartners()});$('#growthForm').addEventListener('submit',saveGrowth);
+// venues
+$('#addVenueBtn').addEventListener('click',function(){openVenueForm('')});$('#quickAddVenue').addEventListener('click',function(){openVenueForm('')});$('#venueForm').addEventListener('submit',saveVenue);$('#deleteVenueBtn').addEventListener('click',removeVenue);
+// skill
+$('#skillForm').addEventListener('submit',saveSkill);$('#cancelSkillEdit').addEventListener('click',resetSkillForm);
+// exports
+function saveFile(name,mime,content){if(window.Android&&typeof Android.saveFile==='function')Android.saveFile(name,mime,content);else{var blob=new Blob([content],{type:mime}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},500)}}
+$('#exportJson').addEventListener('click',function(){saveFile('羽球手账_'+today()+'.json','application/json',JSON.stringify(data,null,2))});
+$('#exportSessionsCsv').addEventListener('click',function(){var head=['日期','开始','结束','时长','场馆','分时场地','球搭子','形式','强度','状态','球技解锁','高光','发生了什么','下次想练','备注'];var rows=data.sessions.map(function(s){return [s.date,timeLabel(s.start),timeLabel(s.end),s.hours,venueName(s),courtSummary(s),sessionPartnerNames(s).join('、'),s.type,s.intensity,'⭐'.repeat(s.state||0),s.unlock,s.highlight,s.event,s.next,s.note]});saveFile('打球记录_'+today()+'.csv','text/csv',[head].concat(rows).map(function(r){return r.map(csvCell).join(',')}).join('\n'))});
+$('#exportPartnersCsv').addEventListener('click',function(){var head=['当前名称','性别','曾用名','球风','喜好','擅长','配合提示','备注','一起打球次数','共同小时'];var rows=data.partners.map(function(p){var st=partnerStats(p.id);return [p.name,p.gender||'',(p.aliases||[]).join('、'),p.style,p.preferences,p.strengths,p.teamwork,p.notes,st.count,st.hours]});saveFile('球搭子档案_'+today()+'.csv','text/csv',[head].concat(rows).map(function(r){return r.map(csvCell).join(',')}).join('\n'))});
+window.nativeImport=function(text){try{var x=migrate(JSON.parse(text));if(!confirm('导入会覆盖当前数据，确定继续吗？'))return;data=x;saveData();resetSessionForm();toast('导入完成')}catch(e){alert('文件格式不正确')}};
+$('#importBtn').addEventListener('click',function(){if(window.Android&&typeof Android.pickBackup==='function'){Android.pickBackup();return}var f=$('#importFile').files[0];if(!f){toast('请先选择 JSON 文件');return}var r=new FileReader();r.onload=function(){window.nativeImport(r.result)};r.readAsText(f,'utf-8')});if(window.Android)$('#importFile').classList.add('hide');
+$('#clearAll').addEventListener('click',function(){if(confirm('确定清空所有打球记录、技能和球搭子资料吗？')&&confirm('再次确认：此操作无法撤销。')){data=migrate({sessions:[],skills:[],venues:DEFAULT_VENUES.map(function(v){return Object.assign({},v)}),partners:[]});saveData();resetSessionForm();toast('已清空个人数据')}});
+window.addEventListener('resize',function(){if($('#dashboard').classList.contains('active'))drawChart()});
+renderAll();
+</script>
+</body>
+</html>
