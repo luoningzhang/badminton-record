@@ -107,3 +107,21 @@ app/build.gradle
 - 最近 5 条成长记录
 
 所有统计都从已有打球记录和成长轨迹自动计算。
+
+## v2.5：JSON 导入与覆盖更新修复
+
+### JSON 导入
+Android 端现在改为：
+1. 系统文件选择器选择 JSON；
+2. Android 原生代码直接读取并校验 JSON；
+3. 原生写入 App 私有 SharedPreferences；
+4. 页面重新加载并自动迁移旧数据。
+
+不再依赖“把整段 JSON 注入 JavaScript”的链路。
+
+### 固定签名与覆盖更新
+此前 GitHub Actions 每次使用临时 debug 签名，因此每次 APK 的签名可能不同，Android 会要求卸载旧版。
+
+v2.5 改为固定 release 签名。配置一次 GitHub Actions secrets 后，以后只要一直使用同一签名密钥，新的 APK 就可以直接覆盖安装旧 APK。
+
+注意：从此前随机 debug 签名版切换到 v2.5 固定签名版时，仍需最后卸载一次旧版。之后不再需要。

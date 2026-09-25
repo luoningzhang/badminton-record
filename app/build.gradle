@@ -11,8 +11,34 @@ android {
         applicationId 'com.example.badmintonlog'
         minSdk 26
         targetSdk 35
-        versionCode 6
-        versionName '2.4'
+        versionCode 7
+        versionName '2.5'
+    }
+
+    signingConfigs {
+        release {
+            def ksPath = System.getenv('ANDROID_KEYSTORE_PATH')
+            def ksPassword = System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            def ksAlias = System.getenv('ANDROID_KEY_ALIAS')
+            def keyPasswordValue = System.getenv('ANDROID_KEY_PASSWORD')
+
+            if (ksPath && ksPassword && ksAlias && keyPasswordValue) {
+                storeFile file(ksPath)
+                storePassword ksPassword
+                keyAlias ksAlias
+                keyPassword keyPasswordValue
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            if (System.getenv('ANDROID_KEYSTORE_PATH')) {
+                signingConfig signingConfigs.release
+            }
+        }
     }
 
     compileOptions {

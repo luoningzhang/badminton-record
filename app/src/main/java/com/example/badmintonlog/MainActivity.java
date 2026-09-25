@@ -1,6 +1,7 @@
 package com.example.badmintonlog;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -31,6 +32,7 @@ public class MainActivity extends Activity {
     private static final int SAVE_FILE = 4012;
     private static final String PREFS = "badminton_native_storage";
     private static final String DATA_KEY = "tracker_json";
+    private static final String PRE_IMPORT_BACKUP_KEY = "tracker_json_pre_import";
 
     private WebView webView;
     private SharedPreferences prefs;
@@ -76,6 +78,7 @@ public class MainActivity extends Activity {
                 return url != null && !url.startsWith("file:///android_asset/");
             }
         });
+
         webView.addJavascriptInterface(new AndroidBridge(), "Android");
         setContentView(webView);
         webView.loadUrl("file:///android_asset/index.html");
@@ -102,7 +105,13 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> {
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/json");
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                        "application/json",
+                        "text/json",
+                        "text/plain",
+                        "application/octet-stream"
+                });
                 startActivityForResult(intent, PICK_BACKUP);
             });
         }
@@ -113,9 +122,11 @@ public class MainActivity extends Activity {
             saveToDownloads(name, mime, content);
             return;
         }
+
         pendingFileName = name;
         pendingMime = mime;
         pendingContent = content;
+
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mime == null || mime.isEmpty() ? "application/octet-stream" : mime);
@@ -129,13 +140,16 @@ public class MainActivity extends Activity {
             values.put(MediaStore.Downloads.DISPLAY_NAME, name);
             values.put(MediaStore.Downloads.MIME_TYPE, mime);
             values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/BadmintonLog");
+
             ContentResolver resolver = getContentResolver();
             Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
             if (uri == null) throw new Exception("无法创建文件");
+
             try (OutputStream out = resolver.openOutputStream(uri)) {
                 if (out == null) throw new Exception("无法打开文件");
                 out.write(content.getBytes(StandardCharsets.UTF_8));
             }
+
             Toast.makeText(this, "已保存到 Downloads/BadmintonLog", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(this, "保存失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -156,31 +170,68 @@ public class MainActivity extends Activity {
         }
     }
 
+    private String readText(Uri uri) throws Exception {
+        InputStream in = getContentResolver().openInputStream(uri);
+        if (in == null) throw new Exception("无法读取文件");
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        }
+
+        String text = sb.toString().trim();
+        if (text.startsWith("\uFEFF")) text = text.substring(1);
+        return text;
+    }
+
+    private void importBackup(Uri uri) {
+        try {
+            final String importedText = readText(uri);
+
+            if (importedText.isEmpty()) {
+                throw new Exception("文件为空");
+            }
+
+            new JSONObject(importedText);
+
+            new AlertDialog.Builder(this)
+                    .setTitle("导入备份")
+                    .setMessage("导入会覆盖当前 App 内的数据。建议确认已经备份当前数据。是否继续？")
+                    .setNegativeButton("取消", null)
+                    .setPositiveButton("导入", (dialog, which) -> {
+                        String current = prefs.getString(DATA_KEY, "");
+                        prefs.edit()
+                                .putString(PRE_IMPORT_BACKUP_KEY, current == null ? "" : current)
+                                .putString(DATA_KEY, importedText)
+                                .commit();
+
+                        Toast.makeText(this, "导入成功，正在重新加载", Toast.LENGTH_SHORT).show();
+                        webView.reload();
+                    })
+                    .show();
+
+        } catch (Exception e) {
+            Toast.makeText(this, "导入失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onActivityResult(int requestCode, int resultCode, Intent intentData) {
+        super.onActivityResult(requestCode, resultCode, intentData);
 
         if (requestCode == SAVE_FILE) {
-            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-                writePickedFile(data.getData());
+            if (resultCode == RESULT_OK && intentData != null && intentData.getData() != null) {
+                writePickedFile(intentData.getData());
             }
             return;
         }
 
-        if (requestCode == PICK_BACKUP && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            try {
-                Uri uri = data.getData();
-                InputStream in = getContentResolver().openInputStream(uri);
-                if (in == null) throw new Exception("无法读取文件");
-                StringBuilder sb = new StringBuilder();
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-                    String line;
-                    while ((line = br.readLine()) != null) sb.append(line).append('\n');
-                }
-                String quoted = JSONObject.quote(sb.toString());
-                webView.evaluateJavascript("window.nativeImport(" + quoted + ")", null);
-            } catch (Exception e) {
-                Toast.makeText(this, "导入失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
+        if (requestCode == PICK_BACKUP) {
+            if (resultCode == RESULT_OK && intentData != null && intentData.getData() != null) {
+                importBackup(intentData.getData());
             }
         }
     }
@@ -191,6 +242,7 @@ public class MainActivity extends Activity {
             super.onBackPressed();
             return;
         }
+
         webView.evaluateJavascript("window.androidBack ? window.androidBack() : false", value -> {
             if (!"true".equals(value)) MainActivity.super.onBackPressed();
         });
